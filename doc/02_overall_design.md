@@ -12,18 +12,15 @@
 - Notification Manager：期限通知  
 - Template Manager：タスクテンプレート操作
 
-```plantuml
-@startuml
-package "TaskManager Application" {
-    [JavaFX GUI] --> [Controller]
-    [Controller] --> [Service]
-    [Service] --> [Repository]
-    [Repository] --> [H2 Database]
+```mermaid
+flowchart TD
+    GUI[JavaFX GUI] --> CTRL[Controller]
+    CTRL --> SVC[Service]
+    SVC --> REPO[Repository]
+    REPO --> DB[H2 Database]
 
-    [Service] --> [Notification Manager] : 期限通知
-    [Controller] --> [Template Manager] : テンプレート操作
-}
-@enduml
+    SVC -->|期限通知| NM[Notification Manager]
+    CTRL -->|テンプレート操作| TM[Template Manager]
 ```
 
 ## 3. データフロー
@@ -44,27 +41,25 @@ package "TaskManager Application" {
 
 ## 5. シーケンス図（タスク作成例）
 
-```plantuml
-@startuml
-actor User
-participant "JavaFX GUI" as GUI
-participant "Controller" as Ctrl
-participant "Service" as Svc
-participant "Repository" as Repo
-database "H2DB" as DB
+```mermaid
+sequenceDiagram
+    actor User
+    participant GUI as "JavaFX GUI"
+    participant Ctrl as Controller
+    participant Svc as Service
+    participant Repo as Repository
+    participant DB as H2DB
 
-User -> GUI : タスク入力
-GUI -> Ctrl : タスクデータ送信
-Ctrl -> Svc : 新規タスク作成依頼
-Svc -> Repo : DB保存
-Repo -> DB : INSERTタスク
-DB --> Repo : 保存完了
-Repo --> Svc : 保存完了
-Svc --> Ctrl : タスク作成完了
-Ctrl --> GUI : 画面更新
-@enduml
+    User->>GUI: タスク入力
+    GUI->>Ctrl: タスクデータ送信
+    Ctrl->>Svc: 新規タスク作成依頼
+    Svc->>Repo: DB保存
+    Repo->>DB: INSERTタスク
+    DB-->>Repo: 保存完了
+    Repo-->>Svc: 保存完了
+    Svc-->>Ctrl: タスク作成完了
+    Ctrl-->>GUI: 画面更新
 ```
-
 ---
 
 ## 6. 注意点
