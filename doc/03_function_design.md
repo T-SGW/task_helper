@@ -26,14 +26,9 @@
 ## 6. データ管理
 - H2DB にローカル保存  
 - 自動保存  
-- CSV 形式でエクスポート／インポート  
+- CSV 形式でエクスポート／インポート
 
-## 7. UI
-- JavaFX タブ構成（タスク一覧・テンプレート・履歴）  
-- ドラッグ＆ドロップ対応
-
-
-## 8. 画面遷移図
+## 7. 画面遷移図
 ```mermaid
 flowchart TD
     A[タスク一覧] -->|「テンプレート」タブ| B[テンプレート管理]
@@ -44,3 +39,21 @@ flowchart TD
     A -->|「タスク編集」| A
     A -->|「タスク削除」| A
 ```
+
+## 7. 操作フロー図（タスク追加例）
+```mermaid
+flowchart TD
+    U[ユーザー] --> GUI[タスク入力画面]
+    GUI --> Ctrl[Controller]
+    Ctrl --> Svc[Service]
+    Svc --> REPO[Repository]
+    REPO --> DB[H2DB]
+    DB --> REPO
+    REPO --> Svc
+    Svc --> Ctrl
+    Ctrl --> GUI
+    GUI --> U
+```
+
+
+
