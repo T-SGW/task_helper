@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知 - TaskHelper</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .main-content {
+            min-height: 100vh;
+        }
+        .notification-card {
+            transition: transform 0.2s;
+        }
+        .notification-card:hover {
+            transform: translateY(-2px);
+        }
+        .priority-high {
+            border-left: 4px solid #dc3545;
+        }
+        .priority-medium {
+            border-left: 4px solid #ffc107;
+        }
+        .priority-low {
+            border-left: 4px solid #28a745;
+        }
+        .overdue {
+            background-color: #fff5f5;
+            border-left: 4px solid #dc3545;
+        }
+        .due-soon {
+            background-color: #fffbf0;
+            border-left: 4px solid #ffc107;
+        }
+        .notification-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- サイドバー -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <h4 class="text-center mb-4">
+                        <i class="fas fa-tasks text-primary"></i> TaskHelper
+                    </h4>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="fas fa-home"></i> ホーム
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/tasks}">
+                                <i class="fas fa-list"></i> タスク一覧
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/tasks/new}">
+                                <i class="fas fa-plus"></i> タスク作成
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/tasks/notifications}">
+                                <i class="fas fa-bell"></i> 通知
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- メインコンテンツ -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-bell text-warning"></i> 通知センター
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a th:href="@{/tasks}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> タスク一覧に戻る
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 統計サマリー -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clock text-warning notification-icon"></i>
+                                <h4 class="text-warning" th:text="${#lists.size(dueTasks)}">0</h4>
+                                <p class="mb-0">期限間近のタスク</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-body text-center">
+                                <i class="fas fa-exclamation-triangle text-danger notification-icon"></i>
+                                <h4 class="text-danger" th:text="${#lists.size(overdueTasks)}">0</h4>
+                                <p class="mb-0">期限切れのタスク</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 期限切れタスク -->
+                <div class="row mb-4" th:if="${!#lists.isEmpty(overdueTasks)}">
+                    <div class="col-12">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i> 期限切れタスク
+                                    <span class="badge bg-light text-danger ms-2" th:text="${#lists.size(overdueTasks)}">0</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:each="task : ${overdueTasks}" class="mb-3">
+                                    <div class="card notification-card overdue">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="card-title mb-1" th:text="${task.title}">タスクタイトル</h6>
+                                                    <p class="card-text text-muted small mb-2" th:text="${task.description}">説明</p>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-calendar-times"></i>
+                                                            期限: <span th:text="${#temporals.format(task.dueDate, 'yyyy/MM/dd HH:mm')}"></span>
+                                                        </span>
+                                                        <span th:if="${task.priority}" class="badge" 
+                                                              th:classappend="${task.priority == '高'} ? 'bg-danger' : (${task.priority == '中'} ? 'bg-warning text-dark' : 'bg-success')">
+                                                            <i class="fas fa-flag"></i> <span th:text="${task.priority}"></span>
+                                                        </span>
+                                                        <span th:if="${task.category}" class="badge bg-secondary">
+                                                            <i class="fas fa-tag"></i> <span th:text="${task.category}"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-success" 
+                                                                th:onclick="'toggleTask(' + ${task.id} + ')'" title="完了にする">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <a th:href="@{/tasks/{id}(id=${task.id})}" class="btn btn-sm btn-info" title="詳細">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-sm btn-warning" title="編集">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 期限間近タスク -->
+                <div class="row mb-4" th:if="${!#lists.isEmpty(dueTasks)}">
+                    <div class="col-12">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-clock"></i> 期限間近のタスク
+                                    <span class="badge bg-light text-warning ms-2" th:text="${#lists.size(dueTasks)}">0</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div th:each="task : ${dueTasks}" class="mb-3">
+                                    <div class="card notification-card due-soon">
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <h6 class="card-title mb-1" th:text="${task.title}">タスクタイトル</h6>
+                                                    <p class="card-text text-muted small mb-2" th:text="${task.description}">説明</p>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="fas fa-clock"></i>
+                                                            期限: <span th:text="${#temporals.format(task.dueDate, 'yyyy/MM/dd HH:mm')}"></span>
+                                                        </span>
+                                                        <span th:if="${task.priority}" class="badge" 
+                                                              th:classappend="${task.priority == '高'} ? 'bg-danger' : (${task.priority == '中'} ? 'bg-warning text-dark' : 'bg-success')">
+                                                            <i class="fas fa-flag"></i> <span th:text="${task.priority}"></span>
+                                                        </span>
+                                                        <span th:if="${task.category}" class="badge bg-secondary">
+                                                            <i class="fas fa-tag"></i> <span th:text="${task.category}"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-success" 
+                                                                th:onclick="'toggleTask(' + ${task.id} + ')'" title="完了にする">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <a th:href="@{/tasks/{id}(id=${task.id})}" class="btn btn-sm btn-info" title="詳細">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-sm btn-warning" title="編集">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 通知がない場合 -->
+                <div class="row" th:if="${#lists.isEmpty(dueTasks) && #lists.isEmpty(overdueTasks)}">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-bell-slash text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                                <h4 class="text-muted mt-3">通知はありません</h4>
+                                <p class="text-muted">期限間近や期限切れのタスクはありません。</p>
+                                <a th:href="@{/tasks/new}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> 新しいタスクを作成
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 通知設定 -->
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-cog"></i> 通知設定
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <h6>通知のタイミング</h6>
+                                <ul class="small">
+                                    <li><strong>期限間近:</strong> 期限の24時間前から通知</li>
+                                    <li><strong>期限切れ:</strong> 期限を過ぎたタスクを通知</li>
+                                </ul>
+                                
+                                <h6 class="mt-3">アクション</h6>
+                                <ul class="small">
+                                    <li>通知されたタスクは直接完了にできます</li>
+                                    <li>詳細表示や編集も可能です</li>
+                                    <li>完了したタスクは通知から自動的に除外されます</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-lightbulb"></i> ヒント
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <h6>効率的なタスク管理</h6>
+                                <ul class="small">
+                                    <li>期限を設定してタスクの優先順位を明確にしましょう</li>
+                                    <li>優先度を活用して重要なタスクを見逃さないようにしましょう</li>
+                                    <li>定期的に通知をチェックして進捗を管理しましょう</li>
+                                    <li>完了したタスクはすぐにマークして達成感を味わいましょう</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- カスタムJS -->
+    <script>
+        // タスクの完了状態切り替え
+        function toggleTask(taskId) {
+            if (confirm('タスクを完了にしますか？')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/tasks/' + taskId + '/toggle';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        // ページ読み込み時に通知数をチェック
+        document.addEventListener('DOMContentLoaded', function() {
+            const dueTasksCount = parseInt(document.querySelector('.text-warning h4').textContent);
+            const overdueTasksCount = parseInt(document.querySelector('.text-danger h4').textContent);
+            
+            if (dueTasksCount > 0 || overdueTasksCount > 0) {
+                // ブラウザ通知（ユーザーの許可が必要）
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    let message = '';
+                    if (overdueTasksCount > 0) {
+                        message += `期限切れのタスクが${overdueTasksCount}件あります。`;
+                    }
+                    if (dueTasksCount > 0) {
+                        message += `期限間近のタスクが${dueTasksCount}件あります。`;
+                    }
+                    
+                    if (message) {
+                        new Notification('TaskHelper 通知', {
+                            body: message,
+                            icon: '/favicon.ico'
+                        });
+                    }
+                }
+            }
+        });
+        
+        // 通知許可を求める
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>

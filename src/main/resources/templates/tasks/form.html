@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${taskId != null ? 'タスク編集' : 'タスク作成'} + ' - TaskHelper'">タスク作成 - TaskHelper</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .main-content {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- サイドバー -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <h4 class="text-center mb-4">
+                        <i class="fas fa-tasks text-primary"></i> TaskHelper
+                    </h4>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="fas fa-home"></i> ホーム
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/tasks}">
+                                <i class="fas fa-list"></i> タスク一覧
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/tasks/new}">
+                                <i class="fas fa-plus"></i> タスク作成
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/tasks/notifications}">
+                                <i class="fas fa-bell"></i> 通知
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- メインコンテンツ -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${taskId != null ? 'タスク編集' : 'タスク作成'}">タスク作成</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a th:href="@{/tasks}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> 一覧に戻る
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- エラーメッセージ -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span th:text="${error}">エラーメッセージ</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- タスクフォーム -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-edit"></i>
+                                    <span th:text="${taskId != null ? 'タスク情報を編集' : 'タスク情報を入力'}">タスク情報を入力</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="${taskId != null ? '/tasks/' + taskId : '/tasks'}" method="post" th:object="${taskDTO}">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">タイトル <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                                        <div class="form-text">タスクのタイトルを入力してください。</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">説明</label>
+                                        <textarea class="form-control" id="description" rows="4" th:field="*{description}"></textarea>
+                                        <div class="form-text">タスクの詳細な説明を入力してください。</div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="dueDate" class="form-label">期限日時</label>
+                                                <input type="datetime-local" class="form-control" id="dueDate" th:field="*{dueDate}">
+                                                <div class="form-text">タスクの期限を設定してください。</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="priority" class="form-label">優先度</label>
+                                                <select class="form-select" id="priority" th:field="*{priority}">
+                                                    <option value="">選択してください</option>
+                                                    <option value="高">高</option>
+                                                    <option value="中">中</option>
+                                                    <option value="低">低</option>
+                                                </select>
+                                                <div class="form-text">タスクの優先度を選択してください。</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">カテゴリ</label>
+                                                <input type="text" class="form-control" id="category" th:field="*{category}">
+                                                <div class="form-text">タスクのカテゴリを入力してください。</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6" th:if="${taskId != null}">
+                                            <div class="mb-3">
+                                                <div class="form-check mt-4">
+                                                    <input class="form-check-input" type="checkbox" id="completed" th:field="*{completed}">
+                                                    <label class="form-check-label" for="completed">
+                                                        完了済み
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <a th:href="@{/tasks}" class="btn btn-secondary me-md-2">
+                                            <i class="fas fa-times"></i> キャンセル
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i>
+                                            <span th:text="${taskId != null ? '更新' : '作成'}">作成</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- テンプレート選択 -->
+                        <div class="card mb-4" th:if="${taskId == null}">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-template"></i> テンプレートから作成
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(templates)}" class="text-muted text-center py-3">
+                                    テンプレートがありません
+                                </div>
+                                <div th:each="template : ${templates}" class="mb-2">
+                                    <button type="button" class="btn btn-outline-info btn-sm w-100" 
+                                            th:onclick="'applyTemplate(' + ${template.id} + ')'">
+                                        <i class="fas fa-copy"></i>
+                                        <span th:text="${template.name}">テンプレート名</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ヘルプ -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-question-circle"></i> ヘルプ
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <h6>タスク作成のコツ</h6>
+                                <ul class="small">
+                                    <li>タイトルは具体的で分かりやすく</li>
+                                    <li>期限を設定すると通知を受け取れます</li>
+                                    <li>優先度を設定して重要なタスクを管理</li>
+                                    <li>カテゴリでタスクを分類できます</li>
+                                </ul>
+                                
+                                <h6 class="mt-3">優先度の目安</h6>
+                                <ul class="small">
+                                    <li><span class="badge bg-danger">高</span> 緊急・重要なタスク</li>
+                                    <li><span class="badge bg-warning text-dark">中</span> 通常のタスク</li>
+                                    <li><span class="badge bg-success">低</span> 時間があるときに</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- カスタムJS -->
+    <script>
+        // テンプレート適用
+        function applyTemplate(templateId) {
+            if (confirm('テンプレートを適用しますか？現在の入力内容は上書きされます。')) {
+                // テンプレート情報を取得してフォームに適用
+                fetch('/templates/' + templateId + '/api')
+                    .then(response => response.json())
+                    .then(template => {
+                        document.getElementById('title').value = template.taskTitle || '';
+                        document.getElementById('description').value = template.taskDescription || '';
+                        document.getElementById('category').value = template.taskCategory || '';
+                        document.getElementById('priority').value = template.taskPriority || '';
+                        
+                        if (template.taskDueDate) {
+                            // ISO形式に変換
+                            const date = new Date(template.taskDueDate);
+                            const isoString = date.toISOString().slice(0, 16);
+                            document.getElementById('dueDate').value = isoString;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('テンプレートの取得に失敗しました:', error);
+                        alert('テンプレートの適用に失敗しました。');
+                    });
+            }
+        }
+        
+        // フォームバリデーション
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('title').value.trim();
+                if (!title) {
+                    e.preventDefault();
+                    alert('タイトルは必須です。');
+                    document.getElementById('title').focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
