@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.t_sgw.task_helper.controller.TaskController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    <spacing>15</spacing>
+    
+    <Label text="新しいタスクを作成" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    
+    <VBox spacing="8">
+        <Label text="タイトル *" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="titleField" promptText="タスクのタイトルを入力"/>
+    </VBox>
+    
+    <VBox spacing="8">
+        <Label text="説明" style="-fx-font-weight: bold;"/>
+        <TextArea fx:id="descriptionField" promptText="タスクの詳細説明を入力" prefRowCount="10"/>
+    </VBox>
+    
+    <HBox spacing="15">
+        <VBox spacing="8">
+            <Label text="期限" style="-fx-font-weight: bold;"/>
+            <DatePicker fx:id="dueDatePicker"/>
+        </VBox>
+        
+        <VBox spacing="8">
+            <Label text="優先度" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="priorityComboBox" promptText="優先度を選択"/>
+        </VBox>
+        
+        <VBox spacing="8">
+            <Label text="カテゴリ" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="categoryField" promptText="カテゴリを入力"/>
+        </VBox>
+    </HBox>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <CheckBox fx:id="completedCheckBox" text="完了済み"/>
+    </HBox>
+    
+    <HBox spacing="10">
+        <Button text="作成" onAction="#handleSaveTask" style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
+        <Button text="キャンセル" onAction="#handleCancel"/>
+    </HBox>
+</VBox>

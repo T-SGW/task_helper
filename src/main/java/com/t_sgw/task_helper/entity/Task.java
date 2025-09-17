@@ -1,38 +1,17 @@
 package com.t_sgw.task_helper.entity;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "task")
 public class Task {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "title", nullable = false, length = 255)
     private String title;
-
-    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @Column(name = "due_date")
     private LocalDateTime dueDate;
-
-    @Column(name = "completed", nullable = false)
     private boolean completed = false;
-
-    @Column(name = "category", length = 50)
     private String category;
-
-    @Column(name = "priority", length = 10)
     private String priority;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     // デフォルトコンストラクタ
@@ -47,17 +26,16 @@ public class Task {
         this.category = category;
         this.priority = priority;
         this.completed = false;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    // 更新時のタイムスタンプ設定
+    public void updateTimestamps() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters and Setters

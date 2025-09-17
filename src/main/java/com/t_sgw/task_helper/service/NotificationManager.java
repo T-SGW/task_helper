@@ -1,18 +1,18 @@
 package com.t_sgw.task_helper.service;
 
 import com.t_sgw.task_helper.entity.Task;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Service
 public class NotificationManager {
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+
+    public NotificationManager(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     /**
      * 期限が近いタスクをチェック

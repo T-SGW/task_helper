@@ -1,0 +1,224 @@
+/* 全体のスタイル */
+.root {
+    -fx-font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+    -fx-font-size: 14px;
+}
+
+/* テキストスタイル */
+.text-muted {
+    -fx-text-fill: #6c757d;
+}
+
+.text-primary {
+    -fx-text-fill: #007bff;
+}
+
+.text-success {
+    -fx-text-fill: #28a745;
+}
+
+.text-warning {
+    -fx-text-fill: #ffc107;
+}
+
+.text-danger {
+    -fx-text-fill: #dc3545;
+}
+
+/* タスクカードスタイル */
+.task-card {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-border-width: 1px;
+}
+
+.task-card:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #007bff;
+}
+
+.task-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.task-description {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 14px;
+}
+
+.task-due {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 12px;
+}
+
+.task-priority {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* 優先度別スタイル */
+.priority-high {
+    -fx-text-fill: #dc3545;
+}
+
+.priority-medium {
+    -fx-text-fill: #ffc107;
+}
+
+.priority-low {
+    -fx-text-fill: #28a745;
+}
+
+/* 完了タスク */
+.completed-task {
+    -fx-opacity: 0.6;
+}
+
+.completed-task .task-title {
+    -fx-strikethrough: true;
+}
+
+/* 期限関連スタイル */
+.due-soon {
+    -fx-background-color: #fffbf0;
+    -fx-border-color: #ffc107;
+    -fx-border-width: 2px;
+}
+
+.overdue {
+    -fx-background-color: #fff5f5;
+    -fx-border-color: #dc3545;
+    -fx-border-width: 2px;
+}
+
+/* ボタンスタイル */
+.button {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.button-primary {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+}
+
+.button-primary:hover {
+    -fx-background-color: #0056b3;
+}
+
+.button-success {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.button-success:hover {
+    -fx-background-color: #1e7e34;
+}
+
+.button-warning {
+    -fx-background-color: #ffc107;
+    -fx-text-fill: #212529;
+}
+
+.button-warning:hover {
+    -fx-background-color: #e0a800;
+}
+
+.button-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+
+.button-danger:hover {
+    -fx-background-color: #bd2130;
+}
+
+/* フォームスタイル */
+.form-group {
+    -fx-spacing: 5px;
+    -fx-padding: 0 0 15px 0;
+}
+
+.form-label {
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5px 0;
+}
+
+.form-control {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+
+.form-control:focused {
+    -fx-border-color: #80bdff;
+    -fx-effect: dropshadow(gaussian, rgba(0,123,255,.25), 10, 0, 0, 0);
+}
+
+/* テーブルスタイル */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+/* カードスタイル */
+.card {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 20px;
+    -fx-border-width: 1px;
+}
+
+.card-header {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 15px 0;
+}
+
+/* グリッドスタイル */
+.grid-pane {
+    -fx-hgap: 20px;
+    -fx-vgap: 20px;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    .root {
+        -fx-font-size: 12px;
+    }
+    
+    .task-title {
+        -fx-font-size: 14px;
+    }
+    
+    .button {
+        -fx-padding: 6px 12px;
+    }
+}

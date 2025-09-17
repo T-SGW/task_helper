@@ -2,19 +2,22 @@ package com.t_sgw.task_helper.service;
 
 import com.t_sgw.task_helper.dto.TaskDTO;
 import com.t_sgw.task_helper.entity.Task;
-import com.t_sgw.task_helper.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final JsonDataService jsonDataService;
+    private List<Task> tasks;
+
+    public TaskService() {
+        this.jsonDataService = new JsonDataService();
+        this.tasks = new ArrayList<>(jsonDataService.loadInitialData());
+    }
 
     /**
      * タスクを作成
@@ -24,14 +27,18 @@ public class TaskService {
      */
     public Task createTask(TaskDTO dto) {
         Task task = new Task();
+        task.setId(jsonDataService.generateId());
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
         task.setDueDate(dto.getDueDate());
         task.setCompleted(dto.isCompleted());
         task.setCategory(dto.getCategory());
         task.setPriority(dto.getPriority());
+        task.updateTimestamps();
 
-        return taskRepository.save(task);
+        tasks.add(task);
+        saveTasks();
+        return task;
     }
 
     /**
@@ -43,7 +50,7 @@ public class TaskService {
      * @throws RuntimeException タスクが見つからない場合
      */
     public Task updateTask(Long id, TaskDTO dto) {
-        Optional<Task> optionalTask = taskRepository.findById(id);
+        Optional<Task> optionalTask = findTaskById(id);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();
             task.setTitle(dto.getTitle());
@@ -52,8 +59,10 @@ public class TaskService {
             task.setCompleted(dto.isCompleted());
             task.setCategory(dto.getCategory());
             task.setPriority(dto.getPriority());
+            task.updateTimestamps();
 
-            return taskRepository.save(task);
+            saveTasks();
+            return task;
         } else {
             throw new RuntimeException("Task not found with id: " + id);
         }
@@ -66,8 +75,8 @@ public class TaskService {
      * @throws RuntimeException タスクが見つからない場合
      */
     public void deleteTask(Long id) {
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
+        if (tasks.removeIf(task -> task.getId().equals(id))) {
+            saveTasks();
         } else {
             throw new RuntimeException("Task not found with id: " + id);
         }
@@ -81,7 +90,7 @@ public class TaskService {
      * @throws RuntimeException タスクが見つからない場合
      */
     public Task getTask(Long id) {
-        Optional<Task> optionalTask = taskRepository.findById(id);
+        Optional<Task> optionalTask = findTaskById(id);
         if (optionalTask.isPresent()) {
             return optionalTask.get();
         } else {
@@ -95,7 +104,12 @@ public class TaskService {
      * @return 全タスクのリスト
      */
     public List<Task> getAllTasks() {
-        return taskRepository.findAllByOrderByCreatedAtDesc();
+        // デバッグ出力
+        for (Task task : tasks) {
+            System.out.println("JSONから取得したタイトル: " + task.getTitle());
+        }
+
+        return new ArrayList<>(tasks);
     }
 
     /**
@@ -106,7 +120,11 @@ public class TaskService {
     public List<Task> getTasksDueSoon() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tomorrow = now.plusDays(1);
-        return taskRepository.findUpcomingIncompleteTasks(tomorrow);
+        return tasks.stream()
+                .filter(task -> task.getDueDate() != null)
+                .filter(task -> !task.isCompleted())
+                .filter(task -> task.getDueDate().isBefore(tomorrow) && task.getDueDate().isAfter(now))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -116,7 +134,9 @@ public class TaskService {
      * @return 指定した完了状態のタスクのリスト
      */
     public List<Task> getTasksByCompleted(boolean completed) {
-        return taskRepository.findByCompleted(completed);
+        return tasks.stream()
+                .filter(task -> task.isCompleted() == completed)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -126,7 +146,9 @@ public class TaskService {
      * @return 指定したカテゴリのタスクのリスト
      */
     public List<Task> getTasksByCategory(String category) {
-        return taskRepository.findByCategory(category);
+        return tasks.stream()
+                .filter(task -> category.equals(task.getCategory()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -136,7 +158,9 @@ public class TaskService {
      * @return 指定した優先度のタスクのリスト
      */
     public List<Task> getTasksByPriority(String priority) {
-        return taskRepository.findByPriority(priority);
+        return tasks.stream()
+                .filter(task -> priority.equals(task.getPriority()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -146,7 +170,11 @@ public class TaskService {
      * @return 検索条件に一致するタスクのリスト
      */
     public List<Task> searchTasks(String keyword) {
-        return taskRepository.findByTitleOrDescriptionContaining(keyword);
+        String lowerKeyword = keyword.toLowerCase();
+        return tasks.stream()
+                .filter(task -> (task.getTitle() != null && task.getTitle().toLowerCase().contains(lowerKeyword)) ||
+                        (task.getDescription() != null && task.getDescription().toLowerCase().contains(lowerKeyword)))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -157,14 +185,33 @@ public class TaskService {
      * @throws RuntimeException タスクが見つからない場合
      */
     public Task toggleTaskCompletion(Long id) {
-        Optional<Task> optionalTask = taskRepository.findById(id);
+        Optional<Task> optionalTask = findTaskById(id);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();
             task.setCompleted(!task.isCompleted());
-            return taskRepository.save(task);
+            task.updateTimestamps();
+
+            saveTasks();
+            return task;
         } else {
             throw new RuntimeException("Task not found with id: " + id);
         }
+    }
+
+    /**
+     * IDでタスクを検索
+     */
+    private Optional<Task> findTaskById(Long id) {
+        return tasks.stream()
+                .filter(task -> task.getId().equals(id))
+                .findFirst();
+    }
+
+    /**
+     * タスクを保存
+     */
+    private void saveTasks() {
+        jsonDataService.saveAllTasks(tasks);
     }
 
     /**

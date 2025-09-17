@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.t_sgw.task_helper.controller.HomeController" spacing="20" style="-fx-padding: 20;">
+
+    <!-- ヘッダー -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="ダッシュボード" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Button text="更新" onAction="#refresh" style="-fx-background-color: #007bff; -fx-text-fill: white;" />
+    </HBox>
+
+    <!-- 統計カード -->
+    <GridPane hgap="20" vgap="20">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+        </columnConstraints>
+
+        <!-- 総タスク数 -->
+        <VBox style="-fx-background-color: #e3f2fd; -fx-padding: 15; -fx-background-radius: 5;" GridPane.columnIndex="0">
+            <Label text="総タスク数" style="-fx-font-size: 14px; -fx-text-fill: #1976d2;" />
+            <Label fx:id="totalTasksLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- 完了タスク -->
+        <VBox style="-fx-background-color: #e8f5e8; -fx-padding: 15; -fx-background-radius: 5;" GridPane.columnIndex="1">
+            <Label text="完了タスク" style="-fx-font-size: 14px; -fx-text-fill: #2e7d32;" />
+            <Label fx:id="completedTasksLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- 期限間近 -->
+        <VBox style="-fx-background-color: #fff3e0; -fx-padding: 15; -fx-background-radius: 5;" GridPane.columnIndex="2">
+            <Label text="期限間近" style="-fx-font-size: 14px; -fx-text-fill: #f57c00;" />
+            <Label fx:id="dueTasksLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- 期限切れ -->
+        <VBox style="-fx-background-color: #ffebee; -fx-padding: 15; -fx-background-radius: 5;" GridPane.columnIndex="3">
+            <Label text="期限切れ" style="-fx-font-size: 14px; -fx-text-fill: #d32f2f;" />
+            <Label fx:id="overdueTasksLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        </VBox>
+    </GridPane>
+
+    <!-- 完了率 -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
+        <Label text="完了率" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <ProgressBar fx:id="completionProgressBar" progress="0" style="-fx-accent: #28a745;" />
+        <Label fx:id="completionRateLabel" text="0%" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;" />
+    </VBox>
+
+    <!-- タスク表示エリア -->
+    <HBox spacing="20">
+        <!-- 最近のタスク -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-min-width: 400;">
+            <Label text="最近のタスク" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            <VBox fx:id="recentTasksContainer" spacing="10" />
+        </VBox>
+
+        <!-- 期限間近のタスク -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-min-width: 400;">
+            <Label text="期限間近のタスク" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffc107;" />
+            <VBox fx:id="dueTasksContainer" spacing="10" />
+        </VBox>
+    </HBox>
+</VBox>

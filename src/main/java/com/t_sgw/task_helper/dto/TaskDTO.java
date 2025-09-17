@@ -1,6 +1,5 @@
 package com.t_sgw.task_helper.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public class TaskDTO {
@@ -8,7 +7,6 @@ public class TaskDTO {
     private String title;
     private String description;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime dueDate;
 
     private boolean completed;
